@@ -74,6 +74,12 @@ root/
 
 ## Features Overview
 
+### Dashboard
+- **Subject Count**: Shows how many subjects are available in the database.
+- **Student Count** : Shows how many students are registered in the database.
+- **Number of Students Who Failed:** Count the students whose average grade across all assigned subjects is below the passing threshold.
+- **Number of Passed Students:**  Count the students whose average grade across all assigned subjects is above the passing threshold.
+
 ### Authentication
 - **Login System** with MD5 password hashing for secure access.
 - **Session Guard** applied to all pages to ensure restricted access only to authenticated users.
