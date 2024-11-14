@@ -17,7 +17,7 @@
                     <h1 class="h3 mb-4 fw-normal">Login</h1>
                     <form method="post" action="">
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="user1@example.com">
+                            <input type="text" class="form-control" id="email" name="email" placeholder="user1@example.com">
                             <label for="email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
