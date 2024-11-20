@@ -44,6 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
 <body class="bg-secondary-subtle">
     <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="col-3">
+            <?php if (!empty($validation_errors)): ?>
+                <?php echo render_alert($validation_errors, 'danger'); ?>
+            <?php endif; ?>
+            <?php if (!empty($success_message)): ?>
+                <?php echo render_alert([$success_message], 'success'); ?>
+            <?php endif; ?>
             <!-- Login Form -->
             <div class="card">
                 <div class="card-body">
