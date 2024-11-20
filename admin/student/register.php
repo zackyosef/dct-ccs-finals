@@ -1,6 +1,73 @@
 <?php
 require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
+
+// Initialize error message and success message
+$error_message = '';
+$success_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $original_id = trim($_POST['student_id'] ?? '');
+    // Truncate to the first 4 characters
+    $student_id = substr($original_id, 0, 4); 
+
+    $student_data = [
+        'student_id' => $student_id, 
+        'first_name' => trim($_POST['first_name'] ?? ''),
+        'last_name' => trim($_POST['last_name'] ?? '')
+    ];
+
+    // Validate student data
+    $errors = [];
+    if (empty($student_data['student_id'])) {
+        $errors[] = "Student ID is required.";
+    }
+    if (empty($student_data['first_name'])) {
+        $errors[] = "First Name is required.";
+    }
+    if (empty($student_data['last_name'])) {
+        $errors[] = "Last Name is required.";
+    }
+
+    if (empty($errors)) {
+        $connection = db_connection();
+        $query = "SELECT * FROM students WHERE student_id = ?";
+        $stmt = $connection->prepare($query);
+        $stmt->bind_param('s', $student_data['student_id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $error_message = render_alert(["Student ID already exists."], 'danger');
+        } else {
+            // Find the maximum current ID and add 1 to it
+            $query = "SELECT MAX(id) AS max_id FROM students";
+            $result = $connection->query($query);
+            $row = $result->fetch_assoc();
+            $max_id = $row['max_id'];
+            $student_id_unique = $max_id + 1; // Generate the next unique ID
+
+            $query = "INSERT INTO students (id, student_id, first_name, last_name) VALUES (?, ?, ?, ?)";
+            $stmt = $connection->prepare($query);
+            if ($stmt) {
+                $stmt->bind_param('isss', $student_id_unique, $student_data['student_id'], $student_data['first_name'], $student_data['last_name']);
+                if ($stmt->execute()) {
+                    $success_message = render_alert(["Student successfully registered!"], 'success');
+                } else {
+                    $error_message = render_alert(["Failed to register student. Error: " . $stmt->error], 'danger');
+                }
+                $stmt->close();
+            } else {
+                $error_message = render_alert(["Statement preparation failed: " . $connection->error], 'danger');
+            }
+
+            $connection->close();
+        }
+    } else {
+        $error_message = render_alert($errors, 'danger');
+    }
+}
+
 ?>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
