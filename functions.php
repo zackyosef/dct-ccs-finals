@@ -85,8 +85,8 @@ function delete_subject($subject_id) {
     $delete_query = "DELETE FROM subjects WHERE id = ?";
     $delete_stmt = $connection->prepare($delete_query);
     $delete_stmt->bind_param('i', $subject_id);
-    // Introducing the bug: always return false
-    return false;
+    return $delete_stmt->execute(); 
 }
+
 
 ?>
