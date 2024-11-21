@@ -4,16 +4,41 @@ require_once '../../functions.php';
 require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
 
-guard();
+guard(); // Ensure user is authenticated
 
 // Initialize variables
 $error_message = '';
-$success_message = '';
+$success_message = ''; // Define the variable to avoid "undefined variable" error
 
 // Check if an ID is provided
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: /admin/subject/add.php"); // Redirect back to subjects if no ID is provided
-    exit();
+if (isset($_GET['id'])) {
+    $student_id = intval($_GET['id']);
+    $student_data = manageStudentData($student_id);
+
+    if (!$student_data) {
+        $error_message = "Student not found.";
+    }
+} else {
+    $error_message = "No student selected to edit.";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
+    if (isset($student_id)) {
+        $updated_data = [
+            'first_name' => trim($_POST['first_name'] ?? ''),
+            'last_name' => trim($_POST['last_name'] ?? ''),
+        ];
+
+        // Validate updated data
+        if (empty($updated_data['first_name']) || empty($updated_data['last_name'])) {
+            $error_message = "First Name and Last Name are required.";
+        } else {
+            // Update the student record
+            list($success_message, $error_message) = manageStudentData($student_id, $updated_data['first_name'], $updated_data['last_name']);
+        }
+    } else {
+        $error_message = "Invalid student ID.";
+    }
 }
 ?>
 
@@ -64,4 +89,4 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 </main>
 
 <?php require_once '../partials/footer.php'; ?>
-<?php ob_end_flush();
+<?php ob_end_flush(); ?>
