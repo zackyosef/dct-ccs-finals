@@ -180,5 +180,51 @@ function deleteStudent($student_id) {
 
     return $result;
 }
+function fetchAvailableSubjects($student_id) {
+    $connection = db_connection();
+    $query = "SELECT * FROM subjects WHERE id NOT IN (SELECT subject_id FROM students_subjects WHERE student_id = ?)";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $student_id);
+    $stmt->execute();
+    $available_subjects = $stmt->get_result();
+    
+    $stmt->close();
+    $connection->close();
 
+    return $available_subjects;
+}
+
+function attachSubjectsToStudent($student_id, $selected_subjects) {
+    $connection = db_connection();
+    $grade = 0.00; // Default grade value
+
+    foreach ($selected_subjects as $subject_id) {
+        $query = "INSERT INTO students_subjects (student_id, subject_id, grade) VALUES (?, ?, ?)";
+        $stmt = $connection->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('iid', $student_id, $subject_id, $grade);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
+
+    $connection->close();
+}
+
+function fetchAttachedSubjects($student_id) {
+    $connection = db_connection();
+    $query = "SELECT subjects.subject_code, subjects.subject_name, students_subjects.grade, students_subjects.id 
+              FROM subjects 
+              JOIN students_subjects ON subjects.id = students_subjects.subject_id 
+              WHERE students_subjects.student_id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $student_id);
+    $stmt->execute();
+    $attached_subjects = $stmt->get_result();
+
+    $stmt->close();
+    $connection->close();
+
+    return $attached_subjects;
+}
 ?>
