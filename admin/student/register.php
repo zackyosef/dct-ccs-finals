@@ -1,7 +1,7 @@
-<?php guard(); ?>
 <?php
 require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
+guard();
 
 // Initialize error message and success message
 $error_message = '';
