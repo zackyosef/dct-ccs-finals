@@ -46,4 +46,19 @@ if (isset($_GET['id'])) {
     exit;
 }
 ?>
-?>
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
+    <h1 class="h2">Detach a Subject</h1>
+
+    <?php if (!empty($error_message)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($error_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php elseif (!empty($success_message)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($success_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+</main>
+
