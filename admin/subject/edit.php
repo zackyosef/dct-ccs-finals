@@ -1,3 +1,4 @@
+<?php guard(); ?>
 <?php
 ob_start(); 
 

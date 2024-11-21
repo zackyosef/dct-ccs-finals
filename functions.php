@@ -95,5 +95,19 @@ function delete_subject($subject_id) {
     return $delete_stmt->execute(); 
 }
 
+// Function to check if the user is logged in and redirect if not
+function guard() {
+    // Check if the user is logged in
+    if (!isset($_SESSION['email']) || empty($_SESSION['email'])) {
+        // Get the base URL dynamically
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $host = $_SERVER['HTTP_HOST'];
+        $baseURL = $protocol . $host . '/'; // Ensure it points to the root
+
+        // Redirect to the base URL
+        header("Location: " . $baseURL);
+        exit();
+    }
+}
 
 ?>
