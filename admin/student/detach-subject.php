@@ -24,5 +24,26 @@ if (isset($_GET['id'])) {
     exit;
 }
 
+if (isset($_GET['id'])) {
+    $record = fetchStudentSubjectRecord($record_id, $connection);
 
+    if ($record) {
+        // Handle form submission for detaching subject
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['detach_subject'])) {
+            if (detachSubject($record_id, $connection)) {
+                header("Location: attach-subject.php?id=" . htmlspecialchars($record['student_id']));
+                exit;
+            } else {
+                $error_message = "Failed to detach the subject. Please try again.";
+            }
+        }
+    } else {
+        header("Location: attach-subject.php");
+        exit;
+    }
+} else {
+    header("Location: attach-subject.php");
+    exit;
+}
+?>
 ?>
