@@ -8,6 +8,52 @@ require_once '../partials/side-bar.php';
 // Initialize variables
 $error_message = '';
 $success_message = '';
+
+// Function to fetch subject details
+function fetch_subject_details($subject_id) {
+    $connection = db_connection();
+    $query = "SELECT * FROM subjects WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+// Function to delete subject
+function delete_subject($subject_id) {
+    $connection = db_connection();
+    $delete_query = "DELETE FROM subjects WHERE id = ?";
+    $delete_stmt = $connection->prepare($delete_query);
+    $delete_stmt->bind_param('i', $subject_id);
+    // Introducing the bug: always return false
+    return false;
+}
+
+
+// Check if an ID is provided
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header("Location: /admin/subject/add.php"); // Redirect back to subjects if no ID is provided
+    exit();
+}
+
+$subject_id = intval($_GET['id']);
+$subject = fetch_subject_details($subject_id);
+
+if (!$subject) {
+    $error_message = "Subject not found.";
+} else {
+    // Handle the delete request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_subject'])) {
+        if (delete_subject($subject_id)) {
+            // Redirect immediately after successful deletion
+            header("Location: /admin/subject/add.php");
+            exit(); // Ensure no further code execution
+        } else {
+            $error_message = "Failed to delete the subject.";
+        }
+    }
+}
 ?>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
