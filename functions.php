@@ -67,4 +67,26 @@ function render_alert($messages, $type = 'danger') {
     return $html;
 }
 
+
+// Function to fetch subject details
+function fetch_subject_details($subject_id) {
+    $connection = db_connection();
+    $query = "SELECT * FROM subjects WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+// Function to delete subject
+function delete_subject($subject_id) {
+    $connection = db_connection();
+    $delete_query = "DELETE FROM subjects WHERE id = ?";
+    $delete_stmt = $connection->prepare($delete_query);
+    $delete_stmt->bind_param('i', $subject_id);
+    // Introducing the bug: always return false
+    return false;
+}
+
 ?>
