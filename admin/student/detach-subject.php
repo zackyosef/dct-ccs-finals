@@ -23,4 +23,6 @@ if (isset($_GET['id'])) {
     header("Location: attach-subject.php");
     exit;
 }
+
+
 ?>

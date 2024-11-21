@@ -215,4 +215,28 @@ function getAttachedSubjects($student_id, $connection) {
     $stmt->execute();
     return $stmt->get_result();
 }
+
+// Function to fetch student and subject record based on ID
+function fetchStudentSubjectRecord($record_id, $connection) {
+    $query = "SELECT students.id AS student_id, students.first_name, students.last_name, 
+                     subjects.subject_code, subjects.subject_name 
+              FROM students_subjects 
+              JOIN students ON students_subjects.student_id = students.id 
+              JOIN subjects ON students_subjects.subject_id = subjects.id 
+              WHERE students_subjects.id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $record_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+}
+
+// Function to detach subject from student
+function detachSubject($record_id, $connection) {
+    $delete_query = "DELETE FROM students_subjects WHERE id = ?";
+    $delete_stmt = $connection->prepare($delete_query);
+    $delete_stmt->bind_param('i', $record_id);
+    return $delete_stmt->execute();
+}
 ?>
