@@ -110,4 +110,42 @@ function guard() {
     }
 }
 
+// Function to get selected student data and update student record
+function manageStudentData($student_id, $first_name = null, $last_name = null) {
+    global $success_message, $error_message; // Declare the variables globally
+    
+    $connection = db_connection();
+    
+    if ($first_name !== null && $last_name !== null) {
+        // Update student record
+        $query = "UPDATE students SET first_name = ?, last_name = ? WHERE id = ?";
+        $stmt = $connection->prepare($query);
+        $stmt->bind_param('ssi', $first_name, $last_name, $student_id);
+        
+        if ($stmt->execute()) {
+            $success_message = "Student record successfully updated.";
+            header("Location: ../student/register.php"); // Redirect to the register page after update
+            exit();
+        } else {
+            $error_message = "Failed to update student record. Error: " . $stmt->error;
+        }
+        
+        $stmt->close();
+        $connection->close();
+    } else {
+        // Fetch student data
+        $query = "SELECT * FROM students WHERE id = ?";
+        $stmt = $connection->prepare($query);
+        $stmt->bind_param('i', $student_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $student = $result->fetch_assoc();
+        
+        $stmt->close();
+        $connection->close();
+        return $student;
+    }
+}
+
+
 ?>
