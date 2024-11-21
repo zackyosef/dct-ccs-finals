@@ -8,6 +8,61 @@ require_once '../partials/side-bar.php';
 // Initialize variables
 $error_message = '';
 $success_message = '';
+
+// Check if an ID is provided
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header("Location: /admin/subject/add.php"); // Redirect back to subjects if no ID is provided
+    exit();
+}
+
+$subject_id = intval($_GET['id']);
+
+// Fetch the subject details for editing
+$connection = db_connection();
+$query = "SELECT * FROM subjects WHERE id = ?";
+$stmt = $connection->prepare($query);
+$stmt->bind_param('i', $subject_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$subject = $result->fetch_assoc();
+
+if (!$subject) {
+    $error_message = "Subject not found.";
+} else {
+    // Handle the update request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_subject'])) {
+        $subject_name = trim($_POST['subject_name']);
+        $subject_code = trim($_POST['subject_code']); // Fetch subject_code
+
+        // Validate input
+        if (empty($subject_name)) {
+            $error_message = "Subject name cannot be empty.";
+        } else {
+            // Check for duplicate subject name or code
+            $duplicate_query = "SELECT * FROM subjects WHERE (subject_name = ? OR subject_code = ?) AND id != ?";
+            $duplicate_stmt = $connection->prepare($duplicate_query);
+            $duplicate_stmt->bind_param('ssi', $subject_name, $subject_code, $subject_id);
+            $duplicate_stmt->execute();
+            $duplicate_result = $duplicate_stmt->get_result();
+
+            if ($duplicate_result->num_rows > 0) {
+                $error_message = "A subject with the same name or code already exists.";
+            } else {
+                // Update the subject
+                $update_query = "UPDATE subjects SET subject_name = ?, subject_code = ? WHERE id = ?";
+                $update_stmt = $connection->prepare($update_query);
+                $update_stmt->bind_param('ssi', $subject_name, $subject_code, $subject_id);
+
+                if ($update_stmt->execute()) {
+                    header("Location: /admin/subject/add.php?message=Subject+updated+successfully");
+                    exit(); // Redirect back to the add page after success
+                } else {
+                    $error_message = "Failed to update the subject. Please try again.";
+                }
+            }
+        }
+    }
+}
 ?>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
