@@ -1,9 +1,9 @@
 <?php
 require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
-require_once 'functions.php'; // Include the functions file
 guard();
 
+// Initialize variables
 $error_message = '';
 $success_message = '';
 
@@ -16,25 +16,25 @@ if (isset($_GET['id'])) {
     if (!$student_data) {
         $error_message = "Student not found.";
     } else {
-        // Fetch available subjects
-        $available_subjects = fetchAvailableSubjects($student_id);
+        // Fetch all subjects
+        $connection = db_connection();
 
-        // Handle attaching subjects
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['attach_subjects'])) {
-            if (!empty($_POST['subjects'])) {
-                $selected_subjects = $_POST['subjects'];
-                attachSubjectsToStudent($student_id, $selected_subjects);
+        if ($connection && !$connection->connect_error) {
+            // Fetch subjects not already attached to the student
+            $available_subjects = getAvailableSubjects($student_id, $connection);
+
+            // Handle attaching subjects
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['attach_subjects'])) {
+                handleAttachSubjects($student_id, $_POST['subjects'], $connection);
                 $success_message = "Subjects successfully attached to the student.";
-
-                // Refresh available subjects after attaching
-                $available_subjects = fetchAvailableSubjects($student_id);
-            } else {
-                $error_message = "Please select at least one subject to attach.";
+                $available_subjects = getAvailableSubjects($student_id, $connection);
             }
-        }
 
-        // Fetch already attached subjects
-        $attached_subjects = fetchAttachedSubjects($student_id);
+            // Fetch already attached subjects
+            $attached_subjects = getAttachedSubjects($student_id, $connection);
+        } else {
+            $error_message = "Database connection failed.";
+        }
     }
 } else {
     $error_message = "No student selected.";
