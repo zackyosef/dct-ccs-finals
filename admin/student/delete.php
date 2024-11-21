@@ -4,11 +4,37 @@ require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
 guard();
 
-
 // Initialize variables
 $error_message = '';
 $success_message = '';
 
+if (isset($_GET['id'])) {
+    $student_id = intval($_GET['id']);
+
+    // Fetch student data
+    $student_data = getSelectedStudentData($student_id);
+    if (!$student_data) {
+        $error_message = "Student not found.";
+    }
+} else {
+    $error_message = "No student selected to delete.";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_student'])) {
+    if (isset($student_id)) {
+        // Call the function to delete the student
+        $result = deleteStudent($student_id);
+        if ($result['success']) {
+            // Redirect to the register page after successful deletion
+            header("Location: ../student/register.php"); 
+            exit();
+        } else {
+            $error_message = $result['message'];
+        }
+    } else {
+        $error_message = "Invalid student ID.";
+    }
+}
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
     <h1 class="h2">Delete a Student</h1>
