@@ -1,11 +1,44 @@
 <?php
 require_once '../partials/header.php';
 require_once '../partials/side-bar.php';
-require_once 'functions.php'; 
+require_once 'functions.php'; // Include the functions file
 guard();
 
 $error_message = '';
 $success_message = '';
+
+if (isset($_GET['id'])) {
+    $student_id = intval($_GET['id']);
+
+    // Fetch student data
+    $student_data = getSelectedStudentData($student_id);
+
+    if (!$student_data) {
+        $error_message = "Student not found.";
+    } else {
+        // Fetch available subjects
+        $available_subjects = fetchAvailableSubjects($student_id);
+
+        // Handle attaching subjects
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['attach_subjects'])) {
+            if (!empty($_POST['subjects'])) {
+                $selected_subjects = $_POST['subjects'];
+                attachSubjectsToStudent($student_id, $selected_subjects);
+                $success_message = "Subjects successfully attached to the student.";
+
+                // Refresh available subjects after attaching
+                $available_subjects = fetchAvailableSubjects($student_id);
+            } else {
+                $error_message = "Please select at least one subject to attach.";
+            }
+        }
+
+        // Fetch already attached subjects
+        $attached_subjects = fetchAttachedSubjects($student_id);
+    }
+} else {
+    $error_message = "No student selected.";
+}
 
 ?>
 
