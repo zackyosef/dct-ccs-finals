@@ -49,6 +49,15 @@ if (isset($_GET['id'])) {
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
     <h1 class="h2">Detach a Subject</h1>
 
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"> 
+            <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="../student/register.php">Register Student</a></li>
+            <li class="breadcrumb-item"><a href="attach-subject.php?id=<?php echo htmlspecialchars($record['student_id'] ?? ''); ?>">Attach Subject to Student</a></li>
+            <li class="breadcrumb-item" aria-current="page">Detach Subject from Student</li>
+        </ol>
+    </nav>
+
     <?php if (!empty($error_message)): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?php echo htmlspecialchars($error_message); ?>
@@ -60,5 +69,27 @@ if (isset($_GET['id'])) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
+
+    <?php if (isset($record)): ?>
+        <div class="card">
+            <div class="card-body">
+                <p>Are you sure you want to detach this subject from this student record?</p>
+                <ul>
+                    <li><strong>Student ID:</strong> <?php echo htmlspecialchars($record['student_id']); ?></li>
+                    <li><strong>First Name:</strong> <?php echo htmlspecialchars($record['first_name']); ?></li>
+                    <li><strong>Last Name:</strong> <?php echo htmlspecialchars($record['last_name']); ?></li>
+                    <li><strong>Subject Code:</strong> <?php echo htmlspecialchars($record['subject_code']); ?></li>
+                    <li><strong>Subject Name:</strong> <?php echo htmlspecialchars($record['subject_name']); ?></li>
+                </ul>
+
+                <form method="post">
+                    <a href="attach-subject.php?id=<?php echo htmlspecialchars($record['student_id']); ?>" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" name="detach_subject" class="btn btn-primary">Detach Subject from Student</button>
+                </form>
+            </div>
+        </div>
+    <?php endif; ?>
 </main>
 
+<?php require_once '../partials/footer.php'; ?>
+<?php ob_end_flush(); ?>
