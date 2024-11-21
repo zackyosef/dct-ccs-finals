@@ -1,6 +1,13 @@
 <?php
 // All project functions should be placed here
 
+function checkUserSessionIsActive() {
+    if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
+        header("Location: admin/dashboard.php");
+        exit;
+    }
+}
+
 // Database Configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

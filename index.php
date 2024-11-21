@@ -1,6 +1,6 @@
 <?php
 require_once 'functions.php';
-
+checkUserSessionIsActive();
 $validation_errors = [];
 $success_message = ''; 
 
