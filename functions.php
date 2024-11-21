@@ -148,4 +148,37 @@ function manageStudentData($student_id, $first_name = null, $last_name = null) {
 }
 
 
+function getSelectedStudentData($student_id) {
+    $connection = db_connection();
+    $query = "SELECT * FROM students WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student_data = $result->fetch_assoc();
+    
+    $stmt->close();
+    $connection->close();
+
+    return $student_data;
+}
+
+function deleteStudent($student_id) {
+    $connection = db_connection();
+    $query = "DELETE FROM students WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $student_id);
+
+    if ($stmt->execute()) {
+        $result = ['success' => true, 'message' => ''];
+    } else {
+        $result = ['success' => false, 'message' => "Failed to delete student record. Error: " . $stmt->error];
+    }
+
+    $stmt->close();
+    $connection->close();
+
+    return $result;
+}
+
 ?>
