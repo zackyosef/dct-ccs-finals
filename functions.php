@@ -1,5 +1,10 @@
 <?php
 // All project functions should be placed here
+// Check if the session is not started
+if (session_status() === PHP_SESSION_NONE) {
+    // Start the session
+    session_start();
+}
 
 function checkUserSessionIsActive() {
     if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
