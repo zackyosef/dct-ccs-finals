@@ -278,4 +278,64 @@ function updateGrade($record_id, $grade, $connection) {
     $update_stmt->bind_param('di', $grade, $record_id);
     return $update_stmt->execute();
 }
+
+// Function to fetch dashboard data
+function fetchDashboardData($connection) {
+    $data = [
+        'subject_count' => 0,
+        'student_count' => 0,
+        'failed_students' => 0,
+        'passed_students' => 0
+    ];
+
+    // Fetch the number of subjects
+    $subject_count_query = "SELECT COUNT(*) as subject_count FROM subjects";
+    $subject_result = $connection->query($subject_count_query);
+    if ($subject_result && $row = $subject_result->fetch_assoc()) {
+        $data['subject_count'] = $row['subject_count'];
+    }
+
+    // Fetch the number of students
+    $student_count_query = "SELECT COUNT(*) as student_count FROM students";
+    $student_result = $connection->query($student_count_query);
+    if ($student_result && $row = $student_result->fetch_assoc()) {
+        $data['student_count'] = $row['student_count'];
+    }
+
+    // Fetch the number of failed students
+    $failed_students_query = "
+        SELECT COUNT(*) AS failed_students
+        FROM (
+            SELECT 
+                students.id AS student_id,
+                AVG(students_subjects.grade) AS average_grade
+            FROM students
+            LEFT JOIN students_subjects ON students.id = students_subjects.student_id
+            GROUP BY students.id
+            HAVING average_grade < 75
+        ) AS failed";
+    $failed_students_result = $connection->query($failed_students_query);
+    if ($failed_students_result && $row = $failed_students_result->fetch_assoc()) {
+        $data['failed_students'] = $row['failed_students'];
+    }
+
+    // Fetch the number of passed students
+    $passed_students_query = "
+        SELECT COUNT(*) AS passed_students
+        FROM (
+            SELECT 
+                students.id AS student_id,
+                AVG(students_subjects.grade) AS average_grade
+            FROM students
+            LEFT JOIN students_subjects ON students.id = students_subjects.student_id
+            GROUP BY students.id
+            HAVING average_grade >= 75
+        ) AS passed";
+    $passed_students_result = $connection->query($passed_students_query);
+    if ($passed_students_result && $row = $passed_students_result->fetch_assoc()) {
+        $data['passed_students'] = $row['passed_students'];
+    }
+
+    return $data;
+}
 ?>
