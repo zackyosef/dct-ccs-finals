@@ -36,7 +36,7 @@ $dashboard_data = fetchDashboardData($connection);
             <div class="card border-danger mb-3">
                 <div class="card-header bg-danger text-white border-danger">Number of Failed Students:</div>
                 <div class="card-body text-danger">
-                    <h5 class="card-title">0</h5>
+                    <h5 class="card-title"><?php echo htmlspecialchars($dashboard_data['failed_students']); ?></h5>
                 </div>
             </div>
         </div>
