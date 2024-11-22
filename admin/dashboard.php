@@ -5,9 +5,11 @@ include_once '../admin/partials/side-bar.php';
 
 guard();
 
+// Database connection
+$connection = db_connection();
+
 // Fetch the dashboard data
 $dashboard_data = fetchDashboardData($connection);
-
 
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
@@ -18,7 +20,7 @@ $dashboard_data = fetchDashboardData($connection);
             <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white border-primary">Number of Subjects:</div>
                 <div class="card-body text-primary">
-                    <h5 class="card-title">0</h5>
+                    <h5 class="card-title"><?php echo htmlspecialchars($dashboard_data['subject_count']); ?></h5>
                 </div>
             </div>
         </div>
@@ -48,4 +50,5 @@ $dashboard_data = fetchDashboardData($connection);
         </div>
     </div>    
 </main>
+<?php require_once '../admin/partials/footer.php'; ?>
 <!-- Template Files here -->
