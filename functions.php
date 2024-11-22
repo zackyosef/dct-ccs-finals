@@ -244,4 +244,38 @@ function detachSubject($record_id, $connection) {
     $delete_stmt->bind_param('i', $record_id);
     return $delete_stmt->execute();
 }
+
+// Function to fetch record
+function fetchRecord($record_id, $connection) {
+    $query = "SELECT students.id AS student_id, students.first_name, students.last_name, 
+                     subjects.subject_code, subjects.subject_name, students_subjects.grade 
+              FROM students_subjects 
+              JOIN students ON students_subjects.student_id = students.id 
+              JOIN subjects ON students_subjects.subject_id = subjects.id 
+              WHERE students_subjects.id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $record_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+}
+
+// Function to validate grade
+function validateGrade($grade) {
+    if (empty($grade)) {
+        return "Grade cannot be blank.";
+    } elseif (!is_numeric($grade) || $grade < 0 || $grade > 100) {
+        return "Grade must be a numeric value between 0 and 100.";
+    }
+    return '';
+}
+
+// Function to update grade
+function updateGrade($record_id, $grade, $connection) {
+    $update_query = "UPDATE students_subjects SET grade = ? WHERE id = ?";
+    $update_stmt = $connection->prepare($update_query);
+    $update_stmt->bind_param('di', $grade, $record_id);
+    return $update_stmt->execute();
+}
 ?>
