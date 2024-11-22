@@ -31,4 +31,25 @@ if ($record_id) {
     header("Location: attach-subject.php");
     exit;
 }
+
+// Handle form submission for assigning or updating the grade
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_grade'])) {
+    $grade = $_POST['grade'];
+
+    // Validate grade
+    $error_message = validateGrade($grade);
+    if (!$error_message) {
+        $grade = floatval($grade);
+
+        if (updateGrade($record_id, $grade, $connection)) {
+            // Redirect to attach page after successful grade assignment
+            $success_message = "Grade successfully assigned.";
+            header("Location: attach-subject.php?id=" . htmlspecialchars($record['student_id']));
+            exit;
+        } else {
+            $error_message = "Failed to assign the grade. Please try again.";
+        }
+    }
+}
+
 ?>
